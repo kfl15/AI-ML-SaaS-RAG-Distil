@@ -1,0 +1,11 @@
+# Ensure shell scripts always use LF
+*.sh text eol=lf
+
+# Python files should also be LF-safe
+*.py text eol=lf
+
+# JSON / text artifacts
+*.json text eol=lf
+*.jsonl text eol=lf
+*.txt text eol=lf
+*.md text eol=lf
