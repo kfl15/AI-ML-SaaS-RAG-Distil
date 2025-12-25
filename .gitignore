@@ -19,6 +19,7 @@ questions/
 rag_answers/
 filtered/
 intermediate/
+0_prompt_and_rough/
 
 # OS
 .DS_Store

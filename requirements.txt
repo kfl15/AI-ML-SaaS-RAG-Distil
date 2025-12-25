@@ -1,0 +1,7 @@
+# Filled incrementally
+langchain
+langchain-community
+langchain-chroma
+langchain-ollama
+chromadb
+pydantic
