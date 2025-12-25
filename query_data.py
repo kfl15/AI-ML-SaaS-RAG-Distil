@@ -126,7 +126,7 @@ def query_rag(query_text: str):
     # print(prompt)
 
     model = Ollama(
-        model="gemma:2b",          # or mistral later
+        model="mistral:latest",          # or mistral later
         base_url="http://172.28.128.1:11434"
     )
     response_text = model.invoke(prompt)

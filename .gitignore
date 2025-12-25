@@ -24,3 +24,6 @@ intermediate/
 # OS
 .DS_Store
 Thumbs.db
+
+raw_docs/
+data_2/
