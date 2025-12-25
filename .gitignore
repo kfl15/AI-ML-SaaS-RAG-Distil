@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+
+# Virtual environments (kept outside repo)
+venv*/
+.env*/
+
+# Vector DB / data
+data_2/
+chroma/
+*.sqlite3
+
+# Generated datasets
+questions/
+rag_answers/
+filtered/
+intermediate/
+
+# OS
+.DS_Store
+Thumbs.db
