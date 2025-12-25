@@ -13,6 +13,8 @@ from langchain_community.document_loaders import PyPDFDirectoryLoader
 from langchain_community.vectorstores import Chroma
 from langchain_chroma import Chroma
 
+from langchain_community.document_loaders import DirectoryLoader, TextLoader, PyPDFLoader
+
 
 
 
@@ -35,10 +37,30 @@ def main():
     add_to_chroma(chunks)
 
 
-def load_documents():
-    document_loader = PyPDFDirectoryLoader(DATA_PATH)
-    return document_loader.load()
+# def load_documents():
+#     document_loader = PyPDFDirectoryLoader(DATA_PATH)
+#     return document_loader.load()
 
+def load_documents():
+    loaders = [
+        DirectoryLoader(
+            DATA_PATH,
+            glob="**/*.pdf",
+            loader_cls=PyPDFLoader,
+        ),
+        DirectoryLoader(
+            DATA_PATH,
+            glob="**/*.txt",
+            loader_cls=TextLoader,
+            loader_kwargs={"encoding": "utf-8"},
+        ),
+    ]
+
+    documents = []
+    for loader in loaders:
+        documents.extend(loader.load())
+
+    return documents
 
 def split_documents(documents: list[Document]):
     text_splitter = RecursiveCharacterTextSplitter(
