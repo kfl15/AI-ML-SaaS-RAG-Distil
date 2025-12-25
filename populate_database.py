@@ -3,7 +3,7 @@ import os
 import shutil
 
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain.schema.document import Document
+from langchain_core.documents import Document
 from get_embedding_function import get_embedding_function
 
 # from langchain.vectorstores.chroma import Chroma
@@ -17,8 +17,7 @@ from langchain_chroma import Chroma
 
 
 CHROMA_PATH = "data_2"
-DATA_PATH = "data_2"
-
+DATA_PATH = "raw_docs"
 
 def main():
 

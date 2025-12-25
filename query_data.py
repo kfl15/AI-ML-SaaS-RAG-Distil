@@ -1,5 +1,5 @@
 import argparse
-from langchain.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate
 
 
 from get_embedding_function import get_embedding_function
@@ -125,7 +125,10 @@ def query_rag(query_text: str):
     prompt = prompt_template.format(context=context_text, question=query_text)
     # print(prompt)
 
-    model = Ollama(model="mistral:latest")
+    model = Ollama(
+        model="gemma:2b",          # or mistral later
+        base_url="http://172.28.128.1:11434"
+    )
     response_text = model.invoke(prompt)
 
     sources = [doc.metadata.get("id", None) for doc, _score in results]
@@ -137,114 +140,6 @@ def query_rag(query_text: str):
 if __name__ == "__main__":
     main()
 
-import os
-import json
-from pathlib import Path
-from langchain_ollama import OllamaLLM
-from langchain.prompts import ChatPromptTemplate
-
-# -----------------------------
-# Configuration
-# -----------------------------
-CHUNK_DIR = Path("chunked_docs")
-OUTPUT_FILE = Path("questions/questions.jsonl")
-MODEL_NAME = "mistral:latest"
-TEMPERATURE = 0.2
-MAX_QUESTIONS_PER_CHUNK = 3
-
-PROMPT_TEMPLATE = """
-You are generating training questions.
-
-STRICT RULES:
-- Use ONLY the SOURCE TEXT.
-- Do NOT infer or interpret.
-- Do NOT use external knowledge.
-- Do NOT ask about meaning, symbolism, importance, or significance.
-- Each question must be answerable using ONE sentence from the text.
-- If a fact is not explicitly stated, do NOT ask about it.
-
-TASK:
-Generate up to {max_q} factual questions.
-
-ALLOWED QUESTION TYPES:
-- What happened
-- Who did something
-- What was described
-- When something occurred
-- Where something occurred
-- How something was done (only if explicitly described)
-
-FORBIDDEN QUESTION TYPES:
-- Why is this important
-- What does this represent
-- What does this reveal
-- Any opinion-based question
-
-SELF-CHECK:
-Before outputting a question, verify that its answer appears verbatim in the SOURCE TEXT.
-If not, discard the question.
-
-SOURCE TEXT:
-<<<
-{text}
->>>
-
-OUTPUT FORMAT (JSON ONLY):
-{{ "questions": [ "question 1", "question 2" ] }}
-"""
-
-# -----------------------------
-# Main logic
-# -----------------------------
-def main():
-    if not CHUNK_DIR.exists():
-        raise FileNotFoundError(f"Chunk directory not found: {CHUNK_DIR}")
-
-    OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
-
-    llm = OllamaLLM(
-        model=MODEL_NAME,
-        temperature=TEMPERATURE,
-    )
-
-    prompt = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
-
-    with OUTPUT_FILE.open("w", encoding="utf-8") as out_f:
-        for chunk_file in sorted(CHUNK_DIR.glob("*.txt")):
-            doc_id = chunk_file.stem
-            chunk_id = 0
-
-            text = chunk_file.read_text(encoding="utf-8").strip()
-            if not text:
-                continue
-
-            formatted_prompt = prompt.format(
-                text=text,
-                max_q=MAX_QUESTIONS_PER_CHUNK,
-            )
-
-            response = llm.invoke(formatted_prompt)
-
-            try:
-                parsed = json.loads(response)
-                questions = parsed.get("questions", [])
-            except json.JSONDecodeError:
-                continue
-
-            for q in questions:
-                record = {
-                    "doc_id": doc_id,
-                    "chunk_id": chunk_id,
-                    "question": q.strip(),
-                }
-                out_f.write(json.dumps(record, ensure_ascii=False) + "\n")
-
-    print(f"Questions generated at: {OUTPUT_FILE}")
-
-
-if __name__ == "__main__":
-    main()
 
 def answer_question(question: str) -> str:
     return query_rag(question)
-
