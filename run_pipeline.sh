@@ -5,9 +5,21 @@ echo "========================================"
 echo "AI-ML-SaaS-RAG-Distil | Full Pipeline Run"
 echo "========================================"
 
+
+# -----------------------------
+# Ensure required directories
+# -----------------------------
+if [ ! -d "raw_docs" ]; then
+  echo "Creating raw_docs directory..."
+  mkdir -p raw_docs
+  echo "Please place your PDF or TXT files inside raw_docs/ and re-run the script."
+  exit 1
+fi
+
 # -----------------------------
 # Sanity checks
 # -----------------------------
+
 if [ -z "$VIRTUAL_ENV" ]; then
   echo "ERROR: No active virtual environment detected."
   echo "Please activate your Python venv before running this script."
@@ -18,6 +30,7 @@ if [ ! -f "requirements.txt" ]; then
   echo "ERROR: requirements.txt not found"
   exit 1
 fi
+
 
 if [ ! -d "raw_docs" ]; then
   echo "ERROR: raw_docs folder missing"
